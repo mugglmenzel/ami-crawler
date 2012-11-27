@@ -1,4 +1,4 @@
-= KIT Virtual Appliance Introspection
+= Virtual Appliance Introspection
 
 = DESCRIPTION
 Some Ruby scripts, used for introspecting which packages are installed in 
