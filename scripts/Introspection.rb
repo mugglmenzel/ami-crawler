@@ -3,15 +3,15 @@
 require 'rubygems'
 
 require 'json'
-gem 'json', '~> 1.7.3'
+gem 'json', '~> 1.8.0'
 
 require 'yaml'
 
 require 'aws-sdk'
-gem 'aws-sdk', '~> 1.5.2'
+gem 'aws-sdk', '~> 1.43.2'
 
 require 'net/ssh'
-gem 'net-ssh', '~> 2.4.0'
+gem 'net-ssh', '~> 2.9.1'
 
 require 'thread'
 
@@ -24,6 +24,7 @@ load 'Filter.rb'
 include Filter
 
 module Introspection
+
 
   public
   def introspect
@@ -262,6 +263,7 @@ module Introspection
               logger.info "Connection for user: #{user} is OK"
               logger.info "Do Introspection now"
 
+              time_introspection_start = Time.now
 
 
               logger.info "Uploading script..."
@@ -313,6 +315,9 @@ module Introspection
                 object = bucket.objects[basename]
                 object.write(:file => file_path)
               end
+
+              time_introspection_stop = Time.now
+              logger.info "Introspection time: #{(time_introspection_stop - time_introspection_start)*1000} ms"
 
               # OK, don't repeat
               check = true
@@ -402,7 +407,9 @@ module Introspection
 
       # launch
       logger.info "-- An Instance for this AMI #{ami} is being launched..."
-      
+
+      time_instance_start = Time.now
+
       # instance_store does not support t1.micro
       image = instance = machine_type = nil
       
@@ -412,7 +419,7 @@ module Introspection
         if (image.root_device_type == :instance_store)
           machine_type = "m1.medium"
         else
-          machine_type = "t1.micro"
+          machine_type = "m1.small"
         end
         
         instance = image.run_instance(:key_pair => @key_pair,
@@ -455,6 +462,10 @@ module Introspection
           @bad_amis << ami
         end
       end
+
+      time_instance_stop = Time.now
+      logger.info "Instance creation time: #{(time_instance_stop - time_instance_start)*1000} ms"
+
     end
     
     thread

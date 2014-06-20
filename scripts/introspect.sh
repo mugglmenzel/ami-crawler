@@ -75,7 +75,8 @@ ohai_support() {
     echo "::: Update..."
     sudo apt-get update -qq
     echo "::: Install Ohai..."
-    sudo apt-get install ohai -qq
+#   sudo apt-get install ohai -qq
+    curl -L https://www.opscode.com/chef/install.sh | sudo bash
     echo "::: Run Ohai..."
     ohai > $HOME/ohai_info.json
 }
